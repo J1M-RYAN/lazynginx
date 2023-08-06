@@ -2,11 +2,9 @@ use std::{fs::read_to_string, path::PathBuf};
 
 use tui::{
     style::{Color, Modifier, Style},
-    text::{Line, Span, Spans, Text},
+    text::{Span, Text},
     widgets::{List, ListItem, Paragraph, Wrap},
 };
-
-use crate::app::App;
 
 pub struct LogLocation {
     access_log: PathBuf,

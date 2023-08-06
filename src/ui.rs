@@ -1,8 +1,6 @@
-use std::fmt::format;
-
 use tui::{
     backend::Backend,
-    layout::{Alignment, Constraint, Direction, Layout, Rect},
+    layout::{Alignment, Constraint, Direction, Layout},
     style::{Color, Modifier, Style, Stylize},
     text::Line,
     widgets::{Block, BorderType, Borders, List, ListItem, Paragraph, Tabs},

@@ -1,6 +1,6 @@
 use std::error;
 
-use tui::widgets::{List, ListState, TableState};
+use tui::widgets::ListState;
 
 use crate::{
     status::get_nginx_status,

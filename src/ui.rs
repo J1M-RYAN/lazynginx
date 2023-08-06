@@ -15,13 +15,22 @@ use crate::{
 
 /// Renders the user interface widgets.
 pub fn render<B: Backend>(app: &mut App, frame: &mut Frame<'_, B>) {
-    let nginx_version = get_nginx_version();
+    if app.nginx_version.is_none() {
+        frame.render_widget(
+            Paragraph::new("You do not have nginx installed. Install nginx first, then run again. Press q to close."),
+            frame.size(),
+        );
+        return;
+    }
 
     frame.render_widget(
         Paragraph::new("")
             .block(
                 Block::default()
-                    .title(format!("lazynginx, nginx v{}", nginx_version.unwrap()))
+                    .title(format!(
+                        "lazynginx, nginx v{}",
+                        app.nginx_version.as_mut().unwrap()
+                    ))
                     .title_alignment(Alignment::Center)
                     .borders(Borders::ALL)
                     .border_type(BorderType::Rounded),

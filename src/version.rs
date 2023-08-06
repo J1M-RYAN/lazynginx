@@ -15,14 +15,15 @@ impl Display for NginxVersion {
 }
 
 pub fn get_nginx_version() -> Option<NginxVersion> {
-    let output = Command::new("nginx")
-        .arg("-v")
-        .output()
-        .expect("Failed to run `nginx -v`");
+    let output_result = Command::new("nginx").arg("-v").output();
 
-    if !output.status.success() {
-        return None;
-    }
+    let output = match output_result {
+        Ok(output) => output,
+        Err(_) => {
+            eprintln!("Error: nginx not found");
+            return None;
+        }
+    };
 
     let version_info = String::from_utf8(output.stderr).unwrap();
     let re = Regex::new(r"(\d+)\.(\d+)\.(\d+)").unwrap();

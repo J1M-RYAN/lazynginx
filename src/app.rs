@@ -24,7 +24,7 @@ pub struct App<'a> {
     pub list_state: ListState,
     pub log_list_state: ListState,
     pub status: String,
-    pub nginx_version: NginxVersion,
+    pub nginx_version: Option<NginxVersion>,
     pub titles: Vec<&'a str>,
     pub tab_index: usize,
 }
@@ -41,7 +41,7 @@ impl<'a> Default for App<'a> {
             horizontal_position: 0,
             list_state,
             status: get_nginx_status(),
-            nginx_version: get_nginx_version().unwrap(),
+            nginx_version: get_nginx_version(),
             tab_index: 0,
             titles: vec!["Status", "Config", "Logs", "Templates"],
             log_list_state,

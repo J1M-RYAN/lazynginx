@@ -11,5 +11,7 @@
 - [ ] add reverse proxy template
 - [ ] add static site tempalte
 - [ ] add basic auth template
-- [ ] add crossplane library for config parsing
+- [ ] add crossplane library  or similar for config parsing
+- [x] gracefully handle no nginx found
+
 

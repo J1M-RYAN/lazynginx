@@ -1,0 +1,11 @@
+[package]
+name = "lazynginx"
+version = "0.1.0"
+authors = ["Jim Ryan <mail@jimryan.ie>"]
+license = "MIT"
+edition = "2021"
+
+[dependencies]
+crossterm = "0.26.1"
+regex = "1.9.2"
+tui = { package = "ratatui", version = "0.22.0" }

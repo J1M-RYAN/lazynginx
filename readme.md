@@ -1,3 +1,3 @@
 # lazynginx
 - [x] show nginx version
-- [ ] allow performing all systemctl commands 
+- [x] allow performing all systemctl commands 

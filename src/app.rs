@@ -82,8 +82,10 @@ impl<'a> App<'a> {
     }
 
     pub fn decrement_horizontal(&mut self) {
-        if let Some(res) = self.horizontal_position.checked_sub(1) {
-            self.horizontal_position = res % self.titles.len();
+        if self.horizontal_position == 0 {
+            self.horizontal_position = self.titles.len() - 1;
+        } else {
+            self.horizontal_position -= 1;
         }
         self.tab_index = self.horizontal_position;
     }

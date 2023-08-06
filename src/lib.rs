@@ -24,3 +24,6 @@ mod status;
 
 // Log
 mod logs;
+
+// tabs
+mod tabs;

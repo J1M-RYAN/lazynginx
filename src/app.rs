@@ -5,6 +5,7 @@ use tui::widgets::{ListState, TableState};
 use crate::{
     status::get_nginx_status,
     systemctl::SystemctlCommand,
+    tabs::{get_current_screen, Screen},
     version::{get_nginx_version, NginxVersion},
 };
 
@@ -73,40 +74,58 @@ impl<'a> App<'a> {
         if let Some(res) = self.horizontal_position.checked_add(1) {
             self.horizontal_position = res % self.titles.len();
         }
+        self.tab_index = self.horizontal_position;
     }
 
     pub fn decrement_horizontal(&mut self) {
         if let Some(res) = self.horizontal_position.checked_sub(1) {
             self.horizontal_position = res % self.titles.len();
         }
+        self.tab_index = self.horizontal_position;
     }
 
     pub fn increment_selection(&mut self) {
-        let i = match self.list_state.selected() {
-            Some(i) => {
-                if i >= 6 {
-                    0
-                } else {
-                    i + 1
-                }
+        match get_current_screen(self) {
+            Screen::Config => {}
+            Screen::Status => {
+                let i = match self.list_state.selected() {
+                    Some(i) => {
+                        if i >= 6 {
+                            0
+                        } else {
+                            i + 1
+                        }
+                    }
+                    None => 0,
+                };
+                self.list_state.select(Some(i));
             }
-            None => 0,
-        };
-        self.list_state.select(Some(i));
+            Screen::Logs => {}
+            Screen::Template => {}
+            Screen::Unknown => {}
+        }
     }
 
     pub fn decrement_selection(&mut self) {
-        let i = match self.list_state.selected() {
-            Some(i) => {
-                if i == 0 {
-                    6
-                } else {
-                    i - 1
-                }
+        match get_current_screen(self) {
+            Screen::Config => {}
+            Screen::Status => {
+                let i = match self.list_state.selected() {
+                    Some(i) => {
+                        if i == 0 {
+                            6
+                        } else {
+                            i - 1
+                        }
+                    }
+                    None => 0,
+                };
+                self.list_state.select(Some(i));
             }
-            None => 0,
-        };
-        self.list_state.select(Some(i));
+            Screen::Logs => {}
+            Screen::Template => {}
+            Screen::Unknown => {}
+        }
     }
 
     pub fn selected_command(&self) -> SystemctlCommand {

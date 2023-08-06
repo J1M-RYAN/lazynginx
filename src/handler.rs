@@ -31,7 +31,7 @@ pub fn handle_key_events(key_event: KeyEvent, app: &mut App) -> AppResult<()> {
         }
         KeyCode::Enter => {
             let command = app.selected_command();
-            command.execute();
+            command.execute(app);
             app.status = get_nginx_status()
         }
         // Other handlers you could add here.

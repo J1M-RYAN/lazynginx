@@ -1,5 +1,10 @@
 use std::process::Command;
 
+use crate::{
+    app::App,
+    tabs::{get_current_screen, Screen},
+};
+
 pub enum SystemctlCommand {
     Start,
     Stop,
@@ -23,7 +28,10 @@ impl SystemctlCommand {
         }
     }
 
-    pub fn execute(&self) {
+    pub fn execute(&self, app: &App) {
+        if get_current_screen(app) != Screen::Status {
+            return;
+        }
         let output = Command::new("systemctl")
             .arg(self.as_str())
             .arg("nginx")

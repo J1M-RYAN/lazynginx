@@ -9,7 +9,11 @@ use tui::{
     Frame,
 };
 
-use crate::{app::App, logs::log_locations_component, version::get_nginx_version};
+use crate::{
+    app::App,
+    logs::{access_log, log_locations_component},
+    version::get_nginx_version,
+};
 
 /// Renders the user interface widgets.
 pub fn render<B: Backend>(app: &mut App, frame: &mut Frame<'_, B>) {
@@ -35,8 +39,7 @@ pub fn render<B: Backend>(app: &mut App, frame: &mut Frame<'_, B>) {
             [
                 Constraint::Length(3),
                 Constraint::Length(3),
-                Constraint::Length(u16::try_from(app.titles.len()).unwrap() * 2 + 1),
-                Constraint::Percentage(30),
+                Constraint::Min(u16::try_from(app.titles.len()).unwrap() * 2 + 1),
             ]
             .as_ref(),
         )
@@ -44,19 +47,28 @@ pub fn render<B: Backend>(app: &mut App, frame: &mut Frame<'_, B>) {
 
     let titles = app.titles.iter().map(|t| Line::from(*t)).collect();
     let tabs = Tabs::new(titles)
-        .block(Block::default().borders(Borders::ALL).title("Tabs"))
+        .style(Style::default().bg(Color::Gray))
+        .add_modifier(Modifier::BOLD)
+        .block(
+            Block::default()
+                .borders(Borders::ALL)
+                .border_type(BorderType::Rounded),
+        )
         .select(app.horizontal_position)
-        .style(Style::default().fg(Color::Cyan))
         .highlight_style(
             Style::default()
                 .add_modifier(Modifier::BOLD)
                 .fg(Color::LightBlue),
         );
+
     frame.render_widget(tabs, chunks[0]);
 
     match app.horizontal_position {
         0 => {
-            let status_block = Block::default().title("Status").borders(Borders::ALL);
+            let status_block = Block::default()
+                .title("Status")
+                .borders(Borders::ALL)
+                .border_type(BorderType::Rounded);
             frame.render_widget(
                 Paragraph::new(app.status.clone()).block(status_block),
                 chunks[1],
@@ -84,7 +96,10 @@ pub fn render<B: Backend>(app: &mut App, frame: &mut Frame<'_, B>) {
             frame.render_stateful_widget(commands_list, chunks[2], &mut app.list_state);
         }
         1 => {}
-        2 => frame.render_widget(log_locations_component(), chunks[1]),
+        2 => {
+            frame.render_widget(log_locations_component(), chunks[1]);
+            frame.render_widget(access_log(), chunks[2])
+        }
         _ => {}
     }
 }

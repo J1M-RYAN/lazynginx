@@ -1,6 +1,10 @@
-use std::path::PathBuf;
+use std::{fs::read_to_string, path::PathBuf};
 
-use tui::widgets::{List, ListItem};
+use tui::{
+    style::{Modifier, Style},
+    text::{Line, Span, Spans, Text},
+    widgets::{List, ListItem, Paragraph, Wrap},
+};
 
 pub struct LogLocation {
     access_log: PathBuf,
@@ -22,4 +26,20 @@ pub fn log_locations_component() -> List<'static> {
         .collect();
 
     List::new(log_location_vec)
+}
+pub fn access_log() -> Paragraph<'static> {
+    let log_location = get_log_locations().access_log;
+    let log_contents = read_log(&log_location);
+
+    // Construct a single string from the split lines
+    let log_str = log_contents.content.to_string();
+
+    Paragraph::new(Text::from(log_str)).wrap(Wrap { trim: false })
+}
+
+fn read_log(path: &PathBuf) -> Span<'static> {
+    match read_to_string(path) {
+        Ok(contents) => Span::raw(contents),
+        Err(_) => Span::raw("Failed to read log file."),
+    }
 }

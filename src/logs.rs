@@ -1,10 +1,12 @@
 use std::{fs::read_to_string, path::PathBuf};
 
 use tui::{
-    style::{Modifier, Style},
+    style::{Color, Modifier, Style},
     text::{Line, Span, Spans, Text},
     widgets::{List, ListItem, Paragraph, Wrap},
 };
+
+use crate::app::App;
 
 pub struct LogLocation {
     access_log: PathBuf,
@@ -25,13 +27,25 @@ pub fn log_locations_component() -> List<'static> {
         .map(ListItem::new)
         .collect();
 
-    List::new(log_location_vec)
+    List::new(log_location_vec).highlight_style(
+        Style::default()
+            .add_modifier(Modifier::BOLD)
+            .fg(Color::LightBlue),
+    )
 }
 pub fn access_log() -> Paragraph<'static> {
     let log_location = get_log_locations().access_log;
     let log_contents = read_log(&log_location);
 
-    // Construct a single string from the split lines
+    let log_str = log_contents.content.to_string();
+
+    Paragraph::new(Text::from(log_str)).wrap(Wrap { trim: false })
+}
+
+pub fn error_log() -> Paragraph<'static> {
+    let log_location = get_log_locations().error_log;
+    let log_contents = read_log(&log_location);
+
     let log_str = log_contents.content.to_string();
 
     Paragraph::new(Text::from(log_str)).wrap(Wrap { trim: false })

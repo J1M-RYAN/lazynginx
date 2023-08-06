@@ -11,7 +11,7 @@ use tui::{
 
 use crate::{
     app::App,
-    logs::{access_log, log_locations_component},
+    logs::{access_log, error_log, log_locations_component},
     version::get_nginx_version,
 };
 
@@ -20,10 +20,10 @@ pub fn render<B: Backend>(app: &mut App, frame: &mut Frame<'_, B>) {
     let nginx_version = get_nginx_version();
 
     frame.render_widget(
-        Paragraph::new("welcome to lazynginx")
+        Paragraph::new("")
             .block(
                 Block::default()
-                    .title(format!("nginx v{}", nginx_version.unwrap()))
+                    .title(format!("lazynginx, nginx v{}", nginx_version.unwrap()))
                     .title_alignment(Alignment::Center)
                     .borders(Borders::ALL)
                     .border_type(BorderType::Rounded),
@@ -37,9 +37,8 @@ pub fn render<B: Backend>(app: &mut App, frame: &mut Frame<'_, B>) {
         .margin(1)
         .constraints(
             [
-                Constraint::Length(3),
-                Constraint::Length(3),
-                Constraint::Min(u16::try_from(app.titles.len()).unwrap() * 2 + 1),
+                Constraint::Length(3),       // for the tabs
+                Constraint::Percentage(100), // for the canvas
             ]
             .as_ref(),
         )
@@ -65,13 +64,18 @@ pub fn render<B: Backend>(app: &mut App, frame: &mut Frame<'_, B>) {
 
     match app.horizontal_position {
         0 => {
+            let chunks = Layout::default()
+                .direction(Direction::Horizontal)
+                .constraints([Constraint::Ratio(1, 5), Constraint::Ratio(4, 5)])
+                .split(chunks[1]);
+
             let status_block = Block::default()
                 .title("Status")
                 .borders(Borders::ALL)
                 .border_type(BorderType::Rounded);
             frame.render_widget(
                 Paragraph::new(app.status.clone()).block(status_block),
-                chunks[1],
+                chunks[0],
             );
 
             // Create a list of systemctl commands
@@ -93,12 +97,34 @@ pub fn render<B: Backend>(app: &mut App, frame: &mut Frame<'_, B>) {
                         .border_type(BorderType::Rounded),
                 );
 
-            frame.render_stateful_widget(commands_list, chunks[2], &mut app.list_state);
+            frame.render_stateful_widget(commands_list, chunks[1], &mut app.list_state);
         }
         1 => {}
         2 => {
-            frame.render_widget(log_locations_component(), chunks[1]);
-            frame.render_widget(access_log(), chunks[2])
+            let chunks = Layout::default()
+                .direction(Direction::Horizontal)
+                .constraints([Constraint::Min(27), Constraint::Ratio(4, 5)])
+                .split(chunks[1]);
+
+            frame.render_stateful_widget(
+                log_locations_component().block(
+                    Block::default()
+                        .title("Pick Log File")
+                        .title_alignment(Alignment::Center)
+                        .borders(Borders::ALL)
+                        .border_type(BorderType::Rounded),
+                ),
+                chunks[0],
+                &mut app.log_list_state,
+            );
+
+            if let Some(log_selection) = app.log_list_state.selected() {
+                match log_selection {
+                    0 => frame.render_widget(access_log(), chunks[1]), // Render access_log when selection is 0
+                    1 => frame.render_widget(error_log(), chunks[1]), // Render error_log when selection is 1
+                    _ => {} // Optional: Handle other cases if needed
+                }
+            }
         }
         _ => {}
     }

@@ -1,6 +1,6 @@
 use std::error;
 
-use tui::widgets::{ListState, TableState};
+use tui::widgets::{List, ListState, TableState};
 
 use crate::{
     status::get_nginx_status,
@@ -22,6 +22,7 @@ pub struct App<'a> {
     pub horizontal_position: usize,
 
     pub list_state: ListState,
+    pub log_list_state: ListState,
     pub status: String,
     pub nginx_version: NginxVersion,
     pub titles: Vec<&'a str>,
@@ -31,7 +32,9 @@ pub struct App<'a> {
 impl<'a> Default for App<'a> {
     fn default() -> Self {
         let mut list_state = ListState::default();
+        let mut log_list_state = ListState::default();
         list_state.select(Some(0));
+        log_list_state.select(Some(0));
         Self {
             running: true,
             vertical_position: 0,
@@ -41,6 +44,7 @@ impl<'a> Default for App<'a> {
             nginx_version: get_nginx_version().unwrap(),
             tab_index: 0,
             titles: vec!["Status", "Config", "Logs", "Templates"],
+            log_list_state,
         }
     }
 }
@@ -100,7 +104,20 @@ impl<'a> App<'a> {
                 };
                 self.list_state.select(Some(i));
             }
-            Screen::Logs => {}
+            Screen::Logs => {
+                let i = match self.log_list_state.selected() {
+                    Some(i) => {
+                        //todo be nice if i didn't hardcode this 1, also code is replicated from above
+                        if i >= 1 {
+                            0
+                        } else {
+                            i + 1
+                        }
+                    }
+                    None => 0,
+                };
+                self.log_list_state.select(Some(i));
+            }
             Screen::Template => {}
             Screen::Unknown => {}
         }
@@ -122,7 +139,19 @@ impl<'a> App<'a> {
                 };
                 self.list_state.select(Some(i));
             }
-            Screen::Logs => {}
+            Screen::Logs => {
+                let i = match self.log_list_state.selected() {
+                    Some(i) => {
+                        if i == 0 {
+                            1
+                        } else {
+                            i - 1
+                        }
+                    }
+                    None => 0,
+                };
+                self.log_list_state.select(Some(i));
+            }
             Screen::Template => {}
             Screen::Unknown => {}
         }

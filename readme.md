@@ -2,7 +2,8 @@
 - [x] show nginx version
 - [x] allow performing all systemctl commands 
 - [x] view log files (error and access)
-- [ ] scroll to bottom of log file automatically
+- [ ] go to bottom of log file automatically
+- [ ] add scolling to log files
 - [x] pick top log file first
 - [ ] add ssh support
 - [ ] add automatic ssl template
